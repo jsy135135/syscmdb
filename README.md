@@ -28,7 +28,7 @@ DATABASES = {
 ### 3、环境依赖
 ```shell
 cd syscmdb
-pip3 install -r requirements.txt
+pip3 install -r requirement.txt
 ```
 ### 4、启动项目
 ```shell
