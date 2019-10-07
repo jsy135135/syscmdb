@@ -25,17 +25,17 @@ DATABASES = {
     }
 }
 ```
-###3、环境依赖
+### 3、环境依赖
 ```shell
 cd syscmdb
 pip3 install -r requirements.txt
 ```
-###4、启动项目
+### 4、启动项目
 ```shell
 cd syscmdb
 python3 manage.py runserver
 ```
-###5、访问页面
+### 5、访问页面
 http://127.0.0.1:8000
 
 Tip:
