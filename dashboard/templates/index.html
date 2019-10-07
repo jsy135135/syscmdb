@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block load_css %}
+    <link href="/static/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link href="/static/css/plugins/iCheck/custom.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    <div class="wrapper wrapper-content animated fadeIn">
+
+        <div class="p-w-md m-t-sm">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <span class="label label-success pull-right">系统用户</span>
+                            <h5>总用户</h5>
+                        </div>
+                        <div class="ibox-content">
+                            <h1 class="no-margins">{{ user_count }}</h1>
+                            <div class="stat-percent font-bold text-success"><i class="fa fa-bolt"></i></div>
+                            <small>总数</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <span class="label label-info pull-right">系统用户组</span>
+                            <h5>总用户组</h5>
+                        </div>
+                        <div class="ibox-content">
+                            <h1 class="no-margins">{{ group_count }}</h1>
+                            <div class="stat-percent font-bold text-info"><i class="fa fa-level-up"></i></div>
+                            <small>总数</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <span class="label label-primary pull-right">资产主机</span>
+                            <h5>总资产主机</h5>
+                        </div>
+                        <div class="ibox-content">
+                            <h1 class="no-margins">{{ host_count }}</h1>
+                            <div class="stat-percent font-bold text-navy"><i class="fa fa-level-up"></i></div>
+                            <small>总数</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <span class="label label-danger pull-right">异常连接资产主机</span>
+                            <h5>总异常连接资产主机</h5>
+                        </div>
+                        <div class="ibox-content">
+                            <h1 class="no-margins">{{ host_error_count }}</h1>
+                            <div class="stat-percent font-bold text-danger"><i class="fa fa-level-down"></i></div>
+                            <small>总数</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-w-md m-t-sm">
+            <div class="row">
+
+                <div class="col-lg-12">
+                    <div class="widget navy-bg no-padding">
+                        <div class="p-m">
+                            <h1 class="m-xs">{{ productd_count }}</h1>
+
+                            <h3 class="font-bold no-margins">
+                                总业务线
+                            </h3>
+                            <small>总业务线统计</small>
+                        </div>
+                        <div class="flot-chart">
+                            <div class="flot-chart-content" id="flot-chart1"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="p-w-md m-t-sm">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <h5>主机刷新探测列表</h5>
+                        </div>
+                        <div class="ibox-content">
+                            <table class="table table-hover no-margins">
+                                <thead>
+                                <tr>
+                                    <th>主机名</th>
+                                    <th>主机管理IP</th>
+                                    <th>连接状态</th>
+                                    <th>添加日期</th>
+                                    <th>刷新时间</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for server in server_list %}
+                                    <tr>
+                                        <td>{{ server.hostname }}</td>
+                                        <td>{{ server.server_auto.ip_inner }}</td>
+                                        <td>{% if server.scan_status %}
+                                            <span class="label label-primary">连接正常</span>{% else %}
+                                            <span class="label label-danger">连接异常</span>{% endif %}</td>
+                                        <td class="text-navy"><i class="fa fa-clock-o"></i> {{ server.create_date }}
+                                        </td>
+                                        <td class="text-navy"><i class="fa fa-clock-o"></i> {{ server.update_date }}
+                                        </td>
+
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block load_js %}
+    <script src="/static/js/plugins/flot/jquery.flot.js"></script>
+    <script src="/static/js/plugins/flot/jquery.flot.tooltip.min.js"></script>
+    <script src="/static/js/plugins/flot/jquery.flot.resize.js"></script>
+    <script>
+        $(document).ready(function () {
+            var d1 = [[1262304000000, 6], [1264982400000, 3057], [1267401600000, 20434], [1270080000000, 31982], [1272672000000,
+                26602], [1275350400000, 27826], [1277942400000, 24302], [1280620800000, 24237], [1283299200000, 21004],
+                [1285891200000, 12144], [1288569600000, 10577], [1291161600000, 10295]];
+            var d2 = [[1262304000000, 5], [1264982400000, 200], [1267401600000, 1605], [1270080000000, 6129], [1272672000000,
+                11643], [1275350400000, 19055], [1277942400000, 30062], [1280620800000, 39197], [1283299200000, 37000],
+                [1285891200000, 27000], [1288569600000, 21000], [1291161600000, 17000]];
+
+            var data1 = [
+                {label: "Data 1", data: d1, color: '#17a084'},
+                {label: "Data 2", data: d2, color: '#127e68'}
+            ];
+            $.plot($("#flot-chart1"), data1, {
+                xaxis: {
+                    tickDecimals: 0
+                },
+                series: {
+                    lines: {
+                        show: true,
+                        fill: true,
+                        fillColor: {
+                            colors: [{
+                                opacity: 1
+                            }, {
+                                opacity: 1
+                            }]
+                        }
+                    },
+                    points: {
+                        width: 0.1,
+                        show: false
+                    }
+                },
+                grid: {
+                    show: false,
+                    borderWidth: 0
+                },
+                legend: {
+                    show: false
+                }
+            })
+        });
+    </script>
+{% endblock %}

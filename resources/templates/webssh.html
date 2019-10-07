@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>syscmdb终端连接</title>
+</head>
+<body>
+<iframe src="{{ url }}" width="100%" frameborder="0" scrolling="no" id="webssh"></iframe>
+</body>
+<script src="/static/js/jquery-3.1.1.min.js"></script>
+<script>
+    //获取当前页面的高度,修改iframe的高度
+    $('#webssh').attr('height',window.innerHeight)
+    console.log(window.innerHeight)
+</script>
+</html>

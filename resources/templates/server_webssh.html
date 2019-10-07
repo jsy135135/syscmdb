@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block load_css %}
+    <link href="/static/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+    <link href="/static/css/plugins/ladda/ladda-themeless.min.css" rel="stylesheet">
+    <link href="/static/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block mbx %}
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-sm-4">
+            <h2>主机展示</h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a href="{% url 'index' %}">首页</a>
+                </li>
+                <li>
+                    <a href="">资源管理</a>
+                </li>
+                <li>
+                    <a href="">主机展示</a>
+                </li>
+            </ol>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body %}
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>主机展示 </h5>
+            </div>
+            <div class="ibox-content">
+                <button type="button" class="btn btn-w-m btn-primary" data-toggle="modal"
+                        data-target="#myModal">
+                    添加服务器
+                </button>
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th class="text-center">业务线</th>
+                        <th class="text-center">机房</th>
+                        <th class="text-center">主机名</th>
+                        <th class="text-center">管理IP</th>
+                        <th class="text-center">机器类型</th>
+                        <th class="text-center">连接状态</th>
+                        <th class="text-center">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for object in object_list %}
+                        <tr>
+                            <td class="text-center"></td>
+                            <td class="text-center">{{ object.idc.name }}</td>
+                            <td class="text-center"><a
+                                    href="{% url 'server_detail' %}?id={{ object.id }}">{{ object.hostname }}</a></td>
+                            <td class="text-center">{{ object.network_set.all.1.ip_address }}</td>
+                            <td class="text-center">虚拟机</td>
+                            {% if object.scan_status == 1 %}
+                                <td class="text-center"><i class="fa fa-circle text-navy"></i></td>
+                            {% else %}
+                                <td class="text-center"><i class="fa fa-circle text-danger"></i></td>
+                            {% endif %}
+                            <td class="text-center">
+                                <a class="btn btn-sm btn-info" onclick="web_ssh({{ object.id }})">连接终端</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <center>
+                    <div class="btn-group">
+                        {% if page_obj.has_previous %}
+                            <a href="{% url 'server_list' %}?page={{ page_obj.previous_page_number }}"
+                               class="btn btn-white">上一页</a>
+                        {% endif %}
+                        {% for page in page_range %}
+                            {% if page_obj.number == page %}
+                                <a class="btn btn-white active">{{ page }}</a>
+                            {% else %}
+                                <a class="btn btn-white" href="{% url 'server_list' %}?page={{ page }}">{{ page }}</a>
+                            {% endif %}
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                            <a href="{% url 'server_list' %}?page={{ page_obj.next_page_number }}"
+                               class="btn btn-white">下一页</a>
+                        {% endif %}
+                    </div>
+                </center>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block load_js %}
+    <script src="/static/js/plugins/ladda/spin.min.js"></script>
+    <script src="/static/js/plugins/ladda/ladda.min.js"></script>
+    <script src="/static/js/plugins/ladda/ladda.jquery.min.js"></script>
+    <script src="/static/js/plugins/sweetalert/sweetalert.min.js"></script>
+    <script src="/static/js/plugins/toastr/toastr.min.js"></script>
+    <script>
+        function web_ssh(id) {
+            var data = {};
+            data['id'] = id;
+            data['csrfmiddlewaretoken'] = "{{ csrf_token }}";
+            $.ajax({
+                url: '{% url 'server_web_ssh' %}',
+                type: 'post',
+                data: data,
+                success: function (res) {
+                    if (res.status == 0) {
+                        swal({
+                            title: res.msg,
+                            text: "进入终端吗?",
+                            type: "success",
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "确定",
+                            cancelButtonText: "取消",
+                            closeOnConfirm: false
+                        }, function () {
+                            window.open("{% url 'webssh' %}?id=" + id, "_blank");
+                            swal.close();
+                        })
+                    } else {
+                        swal({
+                            title: res.msg,
+                            type: 'error',
+                            confirmButtonText: "知道了"
+                        });
+                    }
+                }
+            })
+        };
+    </script>
+{% endblock %}

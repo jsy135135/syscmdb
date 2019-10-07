@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block mbx %}
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-sm-4">
+            <h2>用户展示</h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a hreaf="{% url 'index' %}">首页</a>
+                </li>
+                <li>
+                    <a href="">用户管理</a>
+                </li>
+                <li>
+                    <a href="">用户展示</a>
+                </li>
+            </ol>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body %}
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+        {% if perms.users.add_user %}
+            <a type="button" class="btn btn-w-m btn-primary" href="{% url 'user_add' %}">添加用户</a>
+        {% endif %}
+            <div class="ibox-title">
+                <h5>用户展示 </h5>
+            </div>
+            <div class="ibox-content">
+
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th class="text-center">用户名</th>
+                        <th class="text-center">邮箱</th>
+                        <th class="text-center">微信</th>
+                        <th class="text-center">中文名</th>
+                        <th class="text-center">电话</th>
+                        <th class="text-center">激活状态</th>
+                        <th class="text-center">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for one in object_list %}
+                        <tr>
+                            <td class="text-center">{{ one.username }}</td>
+                            <td class="text-center">{{ one.email }}</td>
+                            <td class="text-center">{{ one.profile.wechat }}</td>
+                            <td class="text-center">{{ one.profile.name_cn }}</td>
+                            <td class="text-center">{{ one.profile.phone }}</td>
+                            {% if one.is_active == 1 %}
+                                <td class="text-center"><i class="fa fa-circle text-navy"></i></td>
+                            {% else %}
+                                <td class="text-center"><i class="fa fa-circle text-danger"></i></td>
+                            {% endif %}
+                            <td class="text-center">
+                                {% if one.is_active == 1 %}
+                                    <button type="button" class="btn btn-warning btn-sm" onclick="user_status(this,{{ one.id }})">禁用</button>
+                                {% else %}
+                                    <button type="button" class="btn btn-success btn-sm" onclick="user_status(this,{{ one.id }})">启用</button>
+                                {% endif %}
+                                <a type="button" class="btn btn-primary btn-sm"
+                                   href="{% url 'user_update' %}?id={{ one.id }}">更新</a>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="user_delete({{ one.id }})">删除</button>
+                             <a type="button" class="btn btn-success btn-sm" href="{% url 'user_set_perm' %}?id={{ one.id }}">权限</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <center>
+                    <div class="btn-group">
+                        {% if page_obj.has_previous %}
+                            <a type="button" class="btn btn-white"
+                           href="{% url 'user_list' %}?page=1">最前页</a>
+                            <a type="button" class="btn btn-white"
+                               href="{% url 'user_list' %}?page={{ page_obj.previous_page_number }}"><i class="fa fa-chevron-left"></i></a>
+                            {% else %}
+                             <a type="button" class="btn btn-white disabled"
+                           href="{% url 'user_list' %}?page=1">最前页</a>
+                            <a type="button" class="btn btn-white disabled"
+                               href="{% url 'user_list' %}"><i class="fa fa-chevron-left"></i></a>
+                        {% endif %}
+                        {#{% for page in paginator.page_range %}#}
+                        {% for page in page_range %}
+                            {% if page_obj.number == page %}
+                                <a class="btn btn-white active"
+                                   href="{% url 'user_list' %}?page={{ page }}">{{ page }}</a>
+                            {% else %}
+                                <a class="btn btn-white"
+                                   href="{% url 'user_list' %}?page={{ page }}">{{ page }}</a>
+                            {% endif %}
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                            <a type="button" class="btn btn-white"
+                               href="{% url 'user_list' %}?page={{ page_obj.next_page_number }}"><i
+                                    class="fa fa-chevron-right"></i></a>
+                            <a type="button" class="btn btn-white"
+                           href="{% url 'user_list' %}?page={{ paginator.num_pages }}">最后页</a>
+                            {% else %}
+                             <a type="button" class="btn btn-white disabled"
+                               href="{% url 'user_list' %}?page={{ paginator.num_pages }}"><i
+                                    class="fa fa-chevron-right"></i></a>
+                            <a type="button" class="btn btn-white disabled"
+                           href="{% url 'user_list' %}?page={{ paginator.num_pages }}">最后页</a>
+                        {% endif %}
+                    </div>
+
+                </center>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block load_js %}
+    <script>
+        function user_delete(id) {
+            swal({
+                    title: "删除用户",
+                    text: "真的确定删除吗?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "确定",
+                    cancelButtonText: "取消",
+                    closeOnConfirm: false
+                },
+                function () {
+                    //正确按钮进行的操作点
+                    $.get('{% url 'user_delete' %}', {id: id}, function (data) {
+                        if (data.status == 0) {
+                            swal({
+                                title: data.msg,
+                                type: 'success',
+                                confirmButtonText: "确定"
+                            }, function () {
+                                window.location.href = '{% url 'user_list' %}';
+                            });
+                        } else {
+                            swal({
+                                title: data.msg,
+                                type: 'error',
+                                confirmButtonText: "确定"
+                            });
+                        }
+                    });
+                });
+        }
+function user_status(this_button,id) {
+            current_status = $(this_button).html()
+            swal({
+                    title: current_status + "用户",
+                    text: "确定" + current_status + "用户?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "确定",
+                    cancelButtonText: "取消",
+                    closeOnConfirm: false
+                },
+                function () {
+                    //正确按钮进行的操作点
+                    $.get('{% url 'user_status' %}', {id: id}, function (data) {
+                        if (data.status == 0) {
+                            swal({
+                                title: data.msg,
+                                type: 'success',
+                                confirmButtonText: "确定"
+                            }, function () {
+                                window.location.href = '{% url 'user_list' %}';
+                            });
+                        } else {
+                            swal({
+                                title: data.msg,
+                                type: 'error',
+                                confirmButtonText: "确定"
+                            });
+                        }
+                    });
+                });
+        }
+    </script>
+{% endblock %}
