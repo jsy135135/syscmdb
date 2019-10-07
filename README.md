@@ -3,7 +3,7 @@
 ## 安装配置
 ### 1、获取项目
 ```git
-git clone git@github.com:jsy135135/syscmdb.git
+git clone https://github.com/jsy135135/syscmdb.git
 ```
 ### 2、测试数据配置
 **导入配置**
